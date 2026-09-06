@@ -28,3 +28,7 @@
       
   * Kiếm chứng động và đo đạc bộ nhớ (GDB + GEF)
      - `attach <PID>` sau khi vào trình `gdb`  hoặc `gdb -p <PID>`: Móc gắn trình gỡ lỗi GDB vào tiến trình `bof2` đang chạy dựa trên PID được in ra từ script python
+        + Sau khi ta chạy `python3 tên_file` nó sẽ xuất ra 1 PID của tiến trình đó
+        + Sử dụng lệnh `sudo gdb -p <PID>` nếu ko có quyền root
+     -`vm`(hoặc`vmap`): Hiển thị bản đồ bộ nhớ ảo của tiến trình, dùng để giúp kiểm tra địa chỉ và quyền truy cập(`rwx`) của các phân vùng mã,`[stack]`,[heap], và các thư viện liên kết `libc`
+
