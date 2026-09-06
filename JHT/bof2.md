@@ -31,4 +31,13 @@
         + Sau khi ta chạy `python3 tên_file` nó sẽ xuất ra 1 PID của tiến trình đó
         + Sử dụng lệnh `sudo gdb -p <PID>` nếu ko có quyền root
      -`vm`(hoặc`vmap`): Hiển thị bản đồ bộ nhớ ảo của tiến trình, dùng để giúp kiểm tra địa chỉ và quyền truy cập(`rwx`) của các phân vùng mã,`[stack]`,[heap], và các thư viện liên kết `libc`
+     - `disass main` : dịch ngược mã máy của hàm `main` sang assembly để xác định cấu trúc lệnh và vị trí sau các hàm nhập xuất dữ liệu
+     - `b *<địa_chỉ>` : Đặt điểm dừng (breakpoint) tại 1 địa chỉ cụ thể trong hàm (VD là ngay sau lệnh gọi hàm read) để chặn luồng thực thi trước khi chương trình so sánh biến
+     - `c`(continue) : Tiếp tục tiến trình chạy đến điểm dừng kế tiếp(chờ nhận payload từ phía script python)
+     - `ni`(next intruction): Thực thi từng lệnh assembly đơn lẻ để theo dỗi chi tiết sự biến đỏi của các thanh ghi và vùng nhớ Stack sau khi nhận dữ liệu tràn
+   
+   **Lưu ý** <img width="556" height="273" alt="image" src="https://github.com/user-attachments/assets/2d158c15-e887-40e0-a488-788fe7518955" />
+   - sau đó ấn `ni` và enter để xem từng bước so sánh đều kiện ở sau , điều kiện đúng thì ta sẽ có shell
+   
+
 
