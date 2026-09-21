@@ -16,6 +16,6 @@ II.Phân tích tĩnh và động(Quy trình tìm lỗi)
  - Tạo ngẫu nhiên : mở `gdb ./bof5`, gõ `pattern create 544`
  - Kích hoạt tràn bộ đệm: Chạy chương trình(`r`) và dán chuỗi 544 kí tự vừa tạo vào lần nhập payload thứ 2
  - Xác định Offset : Chương trình crash(SIGSEGV) , dùng lệnh `pattern search <giá_trị_tại_rsp>` để tự động tính khoảng cách -> ta sẽ tháy kq là 536 bytes từ đầu cho đến `save rip`
- - Xác minh giả thuyết RAX : tại khoảnh khắc crash , gõ `infor registers rax`, nếu RAX trỏ chính xác về chuỗi payload đầu tiên -> điều kiện bẻ khóa thành công 
+ - Xác minh giả thuyết RAX : tại khoảnh khắc crash , gõ `info registers rax ` hay `i r rax`, nếu RAX trỏ chính xác về chuỗi payload đầu tiên -> điều kiện bẻ khóa thành công 
      
     
