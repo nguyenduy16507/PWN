@@ -1,0 +1,8 @@
+- `process & remote`: kết nối tới 1 tiến trình cục bộ(local process) hoặc 1 máy chủ từ xa(remote server)
+- `send & recv` : Truyền(gửi) và nhận dữ liệu
+- `interactive` : Giao tiếp trực tiếp với tiến trình đang kết nối thông qua giao diện dòng lệnh(terminal)
+- `context.log_level` : Thiết lập mức độ chi tiết của dữ liệu được in ra màn hình, chẳng hạn như các gói dữ liệu đã gửi và nhận
+- `packing & unpacking` : Chuyển đổi số nguyên thành mảng byte(đóng gói) hoặc từ mảng byte ngược lại thành số nguyên(mở gói)
+- `gdb.attach` : Gỡ lỗi(debug) một tiến trình cục bộ bằng trình gỡ lỗi GDB
+- `asm & disasm` : Biên dịch(assemble) mã hợp ngữ (assembly) thành mã máy(machine code) hoặc dịch ngược (disassemble) mã máy trở lại thành mã hợp ngữ
+- `ELF` : Thu thập và phân tích các thông tin liên quan đến tệp tin thực thi định dạng ELF 
