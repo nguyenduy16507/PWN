@@ -141,43 +141,45 @@ int main() {
 }
 ```
 * ```sh
-  // tên tệp : orw.c
-  // Lệnh biên dịch : ggc -o orw orw.c -masm=intel
+    // tên tệp : orw.c
+    // Lệnh biên dịch : ggc -o orw orw.c -masm=intel
 
-__asm__(
-   ".global run_sh \n"
-   "run_sh: \n"
+    __asm__(
+    ".global run_sh \n"
+    "run_sh: \n"
 
-   "push 0x67 \n"
-   "mov rax,0x616c662f706d742f \n"
-   "push rax \n"
+    "push 0x67 \n"
+    "mov rax,0x616c662f706d742f \n"
+    "push rax \n"
 
-   "mov rdi, rsp \n"
-   "xor rsi, rsi \n"
-   "xor rdx, rdx \n"
-   "mov rax, 2 \n"
-   "syscall \n"
+    "mov rdi, rsp \n"
+    "xor rsi, rsi \n"
+    "xor rdx, rdx \n"
+    "mov rax, 2 \n"
+    "syscall \n"
 
-   " mov rdi, rax \n"
-   " mov rsi, rsp \n"
-   " sub rsi, 0x30 \n"
-   " mov rdx, 0x30 \n"
-   " mov rax, 0 \n"
-   "syscall \n"
+    " mov rdi, rax \n"
+    " mov rsi, rsp \n"
+    " sub rsi, 0x30 \n"
+    " mov rdx, 0x30 \n"
+    " mov rax, 0 \n"
+    "syscall \n"
 
-   "mov rdi, 1 \n"
-   "mov rax, 0x1 \n"
-   "syscall \n"
+    "mov rdi, 1 \n"
+    "mov rax, 0x1 \n"
+    "syscall \n"
 
-   "mov rdi, 1 \n"
-   "mov rax, 0x3c \n"
-   "syscall \n"
-);
+    "mov rdi, 1 \n"
+    "mov rax, 0x3c \n"
+    "syscall \n"
+     );
 
-void run_sh();
-int main() { run_sh();}
-```
+    void run_sh();
+    int main() { run_sh();}
+
+  ```
+
 * Biên dịch mã C thành tệp thực thi : `gcc -o orw orw.c -masm=intel` : lệnh này sẽ lấy tệp orw.c tạo thành 1 tệp thực thi ELF có tên là `orw`
 * Tạo 1 tệp giả lập có chứ cờ để ktra xem shellcode có thành công hay ko : `echo '{Xin_chuc_mung_da_viet_thanh_cong!}' > /tmp/flag` . Vì shellcode của ta lập trình để đọc `/tmp/flag` nên phải có lệnh này để sau đó ta kiểm tra.
-*`./orw` khởi chạy tệp vừa biên dịch xem có ra là cờ mình vừa tạo ko để ktra shellcode
+* `./orw` khởi chạy tệp vừa biên dịch xem có ra là cờ mình vừa tạo ko để ktra shellcode
    
