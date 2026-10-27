@@ -255,7 +255,8 @@ int main() {
     return 0;
    }
 ```
-* Ta cần phải trích xuất mã máy (opcodes)
+- ta sử dụng mã C này để kiểm tra và gỡ lỗi trước ghi đem đi tấn công . 
+* Để tấn công ta cần phải trích xuất mã máy (opcodes)
   - Khi ta viết mã khai thác bằng python , ta ko thể nhét nguyên 1 đoạn code chứ assembly vào chương trình mục tiêu đc , vì máy tính chỉ hiểu mã máy(các byte thập lục phân)
   - Có 4 bước chuẩn hóa như sau:
     + Biên dịch thành Tệp đối tượng(object file) : `nasm -f elf64 execve.S` : Dịch từ file assemby sang file `.o`(Định dạng ELF64)
@@ -263,6 +264,9 @@ int main() {
     + Dùng `objcopy` để bóc tách phân vùng `.text` ra thành 1 file nhị phân thuần túy tên là `execve.bin` : `objcopy --dump-section .text=execve.bin execve.o`
     + Định dạng thành chuỗi payload(formatting) : `xxd -p execve.bin | tr -d '\n' | sed 's/../\\x&/g'`
       <img width="396" height="179" alt="image" src="https://github.com/user-attachments/assets/2273b1aa-b3ae-4b2d-8496-1a0b79d25ffe" />
+    + <img width="403" height="192" alt="image" src="https://github.com/user-attachments/assets/8e05c903-e303-48bf-a800-1390e733fe89" />
+    + Đoạn chuỗi dài cuối chính là payload mà ta mong muốn 
+
   - Tuy nhiên ta có thể sử dụng tính năng `asm()` tích hơp sẵn trong thư viện pwntools của python nó sẽ tự động làm cả 4 bước trên.
   - Ví dụ 1 đoạn mã python có sử dụng nó trông như thế này 
     ```sh
@@ -287,4 +291,13 @@ int main() {
      p = process('./chuong_trinh_loi')
      p.sendline(shellcode)
   ```
-
+**Lưu ý** : 
+* Ta sử dụng mã C(Skeleton Code + GCC) với mục đích để testing & debugging :
+  - Ta sử dụng mã C làm 1 cái vỏ bọc tạm thời
+    + Khi đang trong  giai đoạn phát triển shellcode, ta cần chạy xem nó có in ra cờ không, hoặc cần ném nó vào trình gỡ lỗi GDB để soi từng thanh ghi
+    + Về mặt bản chất thì trình biên dịc C(`gcc`) sẽ lấy đoạn mã assembly bọc thêm các thông tin cần thiết của hệ điều hành và tạo thành 1 file thực thi độc lập, hoàn chỉnh(như file`./orw` hay`./execve`)
+* Ta sử dụng phương pháp trích xuất (NASM +objump/objcopy/xxd) với mục đích thực chiến / khai thác
+  - khi ta dùng phương pháp bên trên và xác nhận shellcode chạy hoàn hảo trong GDB thì sẽ là lúc mang nó đi hack 1 chươnnh trình bị lỗi
+  - Các lỗ hổng của chương trình mục tiêu ko thể hiểu dược file C hay ELF mà chỉ cho phép bạn bơm vào bộ nhớ của nó các byte dữ liệu thô (raw bytes/ machine code) do đó ta phải sử dụng phương pháp trích xuất này 
+  - Ta sẽ viết script Python(như Pwntoools) đẻ gửi payload tấn công vào chương trình mục tiêu
+  -> Về mặt bản chất thì khi đó ta sẽ loại bỏ toàn bộ những thứ vỏ bọc rườm rà của hệ điều hành mà chỉ dữ lại đúng cái chuỗi byte mã máy độc hại (VD: \x48\x32\xf6......), chuỗi này sẽ đc bơm thẳng qua lỗ hổng vào bộ nhớ chương trình mục tiêu sau đó ta sẽ ép CPU của hệ thống mục tiêu chạy thẳng các byte này  
