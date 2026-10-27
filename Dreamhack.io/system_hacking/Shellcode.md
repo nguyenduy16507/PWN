@@ -264,6 +264,7 @@ int main() {
     + Định dạng thành chuỗi payload(formatting) : `xxd -p execve.bin | tr -d '\n' | sed 's/../\\x&/g'`
       <img width="396" height="179" alt="image" src="https://github.com/user-attachments/assets/2273b1aa-b3ae-4b2d-8496-1a0b79d25ffe" />
   - Tuy nhiên ta có thể sử dụng tính năng `asm()` tích hơp sẵn trong thư viện pwntools của python nó sẽ tự động làm cả 4 bước trên.
+  - Ví dụ 1 đoạn mã python có sử dụng nó trông như thế này 
     ```sh
     from pwn import *
 
