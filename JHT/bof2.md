@@ -19,6 +19,7 @@
        VD: `sendafter(b'>',payload)` : lắng nghe đầu ra từ chương trình, đợi đên khi xuất hiện dấu `>` thì thực hiện payload
      - `interactive()`: Trả lại quyền diều khiển luồng I/O lại cho termianl người dùng khi diều kiện rẽ nhánh thành công
      - <img width="134" height="130" alt="Screenshot 2026-09-06 090805" src="https://github.com/user-attachments/assets/23e5af2e-96e4-4cf7-9f4a-7cc38299f789" />
+     
        + Tạo file python : `subl tên.py`  VD: `sulb slove.py`
        + Chạy file gõ lệnh `python3 Tên_file`  VD: `python3 slove.py`
 
