@@ -75,7 +75,7 @@
     VD: `4195798`
   + Trạng thái 3 : Byte thô(Raw Bytes) : Dành cho CPU và bộ nhớ hiểu
     VD: `b'\xd6\x05\x40\x00\x00\x00\x00\x00'`
-  - Công cụ chuyển đổi: 
+- Công cụ chuyển đổi: 
   + `int(chuỗi, 16)` : Từ mắt người (String) -> python(integer)
   + `hex(số_nguyen)`: từ python(integer) -> mắt người(string)
   + `p64(số_nguyen)`(pack 64-bit): từ pyhton(integer) -> CPU (raw bytes)
