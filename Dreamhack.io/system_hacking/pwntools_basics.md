@@ -67,4 +67,16 @@
 - `asm()` : để lấy đoạn shellcode nạp vào đầu payload
 - bắt buộc phải khai báo `context.arch = 'amd64'` ở đầu script để pwntools biết cần dịch theo kiểu kiến trúc CPU nào
   
-    
+**Lưu ý**    
+- Trạng thái của dữ liệu :
+  + Trạng thái 1 : Chuỗi văn bản (String/hex string): Để hiển thị ra màn hình cho người đọc, máy tính ko dùng cái này để tính toán hay chạy lệnh được
+    VD : `0x4005d6`
+  + Trạng thái 2 : Số nguyên : Dành cho python làm toán (cộng, trừ khoảng cách offset)
+    VD: `4195798`
+  + Trạng thái 3 : Byte thô(Raw Bytes) : Dành cho CPU và bộ nhớ hiểu
+    VD: `b'\xd6\x05\x40\x00\x00\x00\x00\x00'`
+  - Công cụ chuyển đổi: 
+  + `int(chuỗi, 16)` : Từ mắt người (String) -> python(integer)
+  + `hex(số_nguyen)`: từ python(integer) -> mắt người(string)
+  + `p64(số_nguyen)`(pack 64-bit): từ pyhton(integer) -> CPU (raw bytes)
+  + `u64(chuỗi_raw_bytes)`(unpack 64-bit) : Từ CPU(raw bytes) ->python(integer) 
