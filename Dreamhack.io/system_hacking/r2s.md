@@ -36,7 +36,7 @@
   }
 ```
 **Analysis**
-* Đầu tiên ta dùng `pwn checksec .r2s` để kiểm tra cơ chế bảo vệ 
+* Đầu tiên ta dùng `pwn checksec ./r2s` để kiểm tra cơ chế bảo vệ 
  - <img width="428" height="91" alt="image" src="https://github.com/user-attachments/assets/6dcb7b53-82a4-4bcd-988e-a8d212dfc9ad" />
  - Ta thấy tệp r2s này dã được áp dụng biện pháp Canary trên ngăn xếp
 * Nhìn vào trong đoạn code C ta thấy :
