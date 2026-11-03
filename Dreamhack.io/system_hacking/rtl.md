@@ -52,7 +52,9 @@ int main() {
   + Chuỗi "/bin/sh" nằm sẵn trong file binary, ta lấy qua `next(e.share(b"/bin/sh"))` hoặc sử dụng lệnh `grep /bin/sh` hay `search-pattern "/bin/sh"` 
   + Tìm ROP gadgets `pop rdi; ret` : một đoạn mã dùng để bốc giá trị trên cùng của của stack bỏ vào `rdi` : `ROPgasdget --binary ./rtl --re "pop rdi"` trong terminal 
   + gadget `ret` : dùng để căn chỉnh ngăn xếp
-  + <img width="541" height="453" alt="image" src="https://github.com/user-attachments/assets/b9cc1fb5-be54-4e6a-b1dc-5a491396aca9" /> Ta thấy ngay địa chỉa của `pop rdi; ret` và `ret`
+  + <img width="541" height="453" alt="image" src="https://github.com/user-attachments/assets/b9cc1fb5-be54-4e6a-b1dc-5a491396aca9" />
+  
+    Ta thấy ngay địa chỉa của `pop rdi; ret` và `ret`
 
 - Khoảng các từ `buf` đến `return address` của hàm real được tính như sau :
   + Ta đặt breakpoint tại địa chỉ của hàm `read` đầu tiên, khi hàm read được thực thi thì ta nhập thử 1 chuỗi 8 byte rác vào sẽ thấy nó đẩy ngay hàm buf, ta thấy được địa chỉ của hàm buf
